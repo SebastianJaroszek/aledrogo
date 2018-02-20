@@ -7,8 +7,14 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-@WebServlet("/welcome")
-public class WelcomeServlet extends HttpServlet {
+@WebServlet(urlPatterns = {
+        "/allProducts",
+        "/showProductDetails",
+        "/addToCart",
+        "/placeOrder",
+        "/showCart"
+})
+public class AledrogoServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
