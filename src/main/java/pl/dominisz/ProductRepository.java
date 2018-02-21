@@ -15,9 +15,20 @@ import java.util.List;
 
 public class ProductRepository {
 
+    private static ProductRepository instance;
+
+    public static ProductRepository getInstance() {
+        if (instance == null){
+            instance = new ProductRepository();
+            System.out.println("Utworzono instancję ProductRepository");
+        }
+        System.out.println("Prekazuję istniejącą instancję ProductRepository");
+        return instance;
+    }
+
     private List<Product> products = new ArrayList<>();
 
-    public ProductRepository() {
+    private ProductRepository() {
         this.products.add(
                 new Product(
                         1,
