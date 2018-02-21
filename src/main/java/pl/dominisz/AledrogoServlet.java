@@ -37,9 +37,6 @@ public class AledrogoServlet extends HttpServlet {
     }
 
     private void placeOrder(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        //wyciągamy koszyk z sesji
-        // jeśli istnieje i nie jest pusty: (AKTUALIZACJA LICZBY PRODUKTÓW W REPOZYTORIUM) czyścimy koszyk i komunikat o złożeniu zamówienia
-        // jeśli nie istnieje lub jest pusty: komunikat
         HttpSession httpSession = req.getSession();
         Cart cart = (Cart) httpSession.getAttribute("cart");
         PrintWriter out = getPrintWriter(resp);
@@ -47,10 +44,8 @@ public class AledrogoServlet extends HttpServlet {
             List<CartItem> cartItems = cart.getCartItems();
             for (CartItem cartItem : cartItems) {
                 Product product = productRepository.findById(cartItem.getId());
-                if (cartItem.getQuantity() <= product.getCount()){
+                if (cartItem.getQuantity() <= product.getCount()) {
                     productRepository.setCount(product.getId(), product.getCount() - cartItem.getQuantity());
-                } else {
-                    out.println("Nie ma wystarczającej liczby produktów w magazynie");
                 }
             }
             cart.getCartItems().clear();
