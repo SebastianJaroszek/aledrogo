@@ -42,20 +42,48 @@ public class AledrogoServlet extends HttpServlet {
 
     }
 
-    private void showProductDetails(HttpServletRequest req, HttpServletResponse resp) {
+    private PrintWriter getPrintWriter(HttpServletResponse resp) throws IOException {
+        resp.setContentType("text/html");
+        resp.setCharacterEncoding("UTF-8");
+        return resp.getWriter();
+    }
+
+    private void showProductDetails(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        PrintWriter out = getPrintWriter(resp);
+
+        //TODO zabezpieczyć przed wpisaniem czegoś co nie jest liczbą
+        int id = Integer.valueOf(req.getParameter("id"));
+        Product product = productRepository.findById(id);
+        if (product != null) {
+            out.println("<h1>Szczegółowe dane o produkcie</h1>");
+
+            out.println(printProductDetails(product));
+
+            out.println("<form action=\"addToCart\" method=\"POST\">");
+            out.println("<br><br>Liczba sztuk: <input type=\"number\" name=\"quantity\" value=\"1\"> ilość dostępnych sztuk: "
+                    + product.getCount() + "<br><br>");
+
+            out.println("<br><input type=\"submit\" value=\"dodaj do koszyka\">");
+            out.println("</form>");
+            createBackLink(out);
+        }
 
     }
 
+    private String printProductDetails(Product product) {
+        return "Nazwa produktu: " + product.getName()
+                + "<br><br>Opis produktu: " + product.getDescription()
+                + "<br><br>Cena produktu: " + product.getPrice() + " zł";
+    }
+
     private void showAllProducts(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        resp.setContentType("text/html");
-        resp.setCharacterEncoding("UTF-8");
-        PrintWriter out = resp.getWriter();
+        PrintWriter out = getPrintWriter(resp);
         out.println("<h1>Lista wszystkich produktów w sklepie</h1>");
         out.println("<ul>");
 
         List<Product> allProducts = productRepository.findAll();
         for (Product product : allProducts) {
-            out.println(createHtmlForProduct(product));
+            out.println(showProduct(product));
         }
 
         out.println("</ul>");
@@ -64,14 +92,19 @@ public class AledrogoServlet extends HttpServlet {
     }
 
     private void createBackLink(PrintWriter out) {
-        out.println("<br><a href=\"index.jsp\">wróć</a>");
+        out.println("<br><br><a href=\"index.jsp\">wróć</a>");
     }
 
-    private String createHtmlForProduct(Product product) {
+    private String showProduct(Product product) {
         return "<li>" + product.getName()
-                + ", cena: " + product.getPrice()
-                + ", <a href=\"allProducts?id=" + product.getId()
-                + "\">zobacz szczegóły</a></li>";
+                + ", cena: " + product.getPrice() + " zł, "
+                + showProductDetailsLink(product)
+                + "</li>";
+    }
+
+    private String showProductDetailsLink(Product product) {
+        return "<a href=\"showProductDetails?id=" + product.getId()
+                + "\">zobacz szczegóły</a>";
     }
 
     @Override
@@ -83,6 +116,6 @@ public class AledrogoServlet extends HttpServlet {
     }
 
     private void addToCart(HttpServletRequest req, HttpServletResponse resp) {
-
+//        req.getParameter("quantity");
     }
 }
