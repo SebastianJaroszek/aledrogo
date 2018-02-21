@@ -19,7 +19,8 @@ import java.util.List;
 })
 public class AledrogoServlet extends HttpServlet {
 
-    private static ProductRepository productRepository = ProductRepository.getInstance();
+    private ProductRepository productRepository = ProductRepository.getInstance();
+    private Cashbox cashbox = new Cashbox();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
@@ -35,12 +36,60 @@ public class AledrogoServlet extends HttpServlet {
         }
     }
 
-    private void placeOrder(HttpServletRequest req, HttpServletResponse resp) {
-
+    private void placeOrder(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        //wyciągamy koszyk z sesji
+        // jeśli istnieje i nie jest pusty: (AKTUALIZACJA LICZBY PRODUKTÓW W REPOZYTORIUM) czyścimy koszyk i komunikat o złożeniu zamówienia
+        // jeśli nie istnieje lub jest pusty: komunikat
+        HttpSession httpSession = req.getSession();
+        Cart cart = (Cart) httpSession.getAttribute("cart");
+        PrintWriter out = getPrintWriter(resp);
+        if (cart != null && !cart.getCartItems().isEmpty()) {
+            List<CartItem> cartItems = cart.getCartItems();
+            for (CartItem cartItem : cartItems) {
+                Product product = productRepository.findById(cartItem.getId());
+                if (cartItem.getQuantity() <= product.getCount()){
+                    productRepository.setCount(product.getId(), product.getCount() - cartItem.getQuantity());
+                } else {
+                    out.println("Nie ma wystarczającej liczby produktów w magazynie");
+                }
+            }
+            cart.getCartItems().clear();
+            out.println("<h1>Udało się złożyć zamówienie</h1>");
+        } else {
+            out.println("Koszyk jest pusty");
+        }
+        createBackLink(out);
     }
 
-    private void showCart(HttpServletRequest req, HttpServletResponse resp) {
+    private void showCart(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        HttpSession httpSession = req.getSession();
+        Cart cart = (Cart) httpSession.getAttribute("cart");
+        PrintWriter out = getPrintWriter(resp);
+        if (cart != null && !cart.getCartItems().isEmpty()) {
+            out.println(printCart(cart));
+            out.println("Całkowita wartość koszyka: " + cashbox.getTotalPrice(cart) + "zł");
+        } else {
+            out.println("Koszyk jest pusty");
+        }
+        createBackLink(out);
+    }
 
+    private String printCart(Cart cart) {
+        String result = "<h1>Zawartość koszyka</h1><br><br>W Twoim koszyku znajdują się produkty:<br><br><ul>";
+        List<CartItem> cartItems = cart.getCartItems();
+        for (CartItem cartItem : cartItems) {
+            Product product = productRepository.findById(cartItem.getId());
+            if (product != null) {
+                result = result + "<li>" + product.getName() + "; cena: " + product.getPrice()
+                        + "zł; ilość: " + cartItem.getQuantity() + "szt.; " + deleteProductLink(product) + "</li>";
+            }
+        }
+        result = result + "</ul>";
+        return result;
+    }
+
+    private String deleteProductLink(Product product) {
+        return "<a href=\"deleteProduct?id=" + product.getCount() + "\">usuń produkt</a>";
     }
 
     private PrintWriter getPrintWriter(HttpServletResponse resp) throws IOException {
@@ -132,5 +181,6 @@ public class AledrogoServlet extends HttpServlet {
 
         PrintWriter out = getPrintWriter(resp);
         out.println("<h1>Udało się dodać produkt do koszyka</h1>");
+        createBackLink(out);
     }
 }
