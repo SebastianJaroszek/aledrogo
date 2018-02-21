@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.List;
 
 @WebServlet(urlPatterns = {
         "/allProducts",
@@ -16,6 +17,8 @@ import java.io.PrintWriter;
         "/showCart"
 })
 public class AledrogoServlet extends HttpServlet {
+
+    private static ProductRepository productRepository = ProductRepository.getInstance();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
@@ -43,8 +46,32 @@ public class AledrogoServlet extends HttpServlet {
 
     }
 
-    private void showAllProducts(HttpServletRequest req, HttpServletResponse resp) {
+    private void showAllProducts(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        resp.setContentType("text/html");
+        resp.setCharacterEncoding("UTF-8");
+        PrintWriter out = resp.getWriter();
+        out.println("<h1>Lista wszystkich produktów w sklepie</h1>");
+        out.println("<ul>");
 
+        List<Product> allProducts = productRepository.findAll();
+        for (Product product : allProducts) {
+            out.println(createHtmlForProduct(product));
+        }
+
+        out.println("</ul>");
+
+        createBackLink(out);
+    }
+
+    private void createBackLink(PrintWriter out) {
+        out.println("<br><a href=\"index.jsp\">wróć</a>");
+    }
+
+    private String createHtmlForProduct(Product product) {
+        return "<li>" + product.getName()
+                + ", cena: " + product.getPrice()
+                + ", <a href=\"allProducts?id=" + product.getId()
+                + "\">zobacz szczegóły</a></li>";
     }
 
     @Override
