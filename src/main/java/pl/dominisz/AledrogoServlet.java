@@ -5,6 +5,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
@@ -62,6 +63,7 @@ public class AledrogoServlet extends HttpServlet {
             out.println("<form action=\"addToCart\" method=\"POST\">");
             out.println("<br><br>Liczba sztuk: <input type=\"number\" name=\"quantity\" value=\"1\"> ilość dostępnych sztuk: "
                     + product.getCount() + "<br><br>");
+            out.println("<input type=\"hidden\" name=\"id\" value=\"" + id + "\">");
 
             out.println("<br><input type=\"submit\" value=\"dodaj do koszyka\">");
             out.println("</form>");
@@ -115,7 +117,20 @@ public class AledrogoServlet extends HttpServlet {
         }
     }
 
-    private void addToCart(HttpServletRequest req, HttpServletResponse resp) {
-//        req.getParameter("quantity");
+    private void addToCart(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        //TODO zabezpieczenie przed NumberFormatException
+        int id = Integer.parseInt(req.getParameter("id"));
+        int quantity = Integer.parseInt(req.getParameter("quantity"));
+        CartItem cartItem = new CartItem(id, quantity);
+        HttpSession httpSession = req.getSession();
+        Cart cart = (Cart) httpSession.getAttribute("cart");
+        if (cart == null) {
+            cart = new Cart();
+            httpSession.setAttribute("cart", cart);
+        }
+        cart.add(cartItem);
+
+        PrintWriter out = getPrintWriter(resp);
+        out.println("<h1>Udało się dodać produkt do koszyka</h1>");
     }
 }
