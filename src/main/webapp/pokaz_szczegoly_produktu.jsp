@@ -30,7 +30,7 @@
         <li class="collection-item">Cena produktu: <%=product.getPrice()%> zł</li>
         <li class="collection-item">
             <form action="dodaj_do_koszyka.jsp" method="POST">
-                <br><br>Liczba sztuk: <input type="number" name="quantity" value="1">
+                <br><br>Liczba sztuk: <input class="input" type="number" name="quantity" value="1">
                 ilość dostępnych sztuk: <%=product.getCount()%>
                 <br><br>
                 <input type="hidden" name="id" value="<%=id%>">
