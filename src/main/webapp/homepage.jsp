@@ -8,10 +8,10 @@
 </head>
 <body>
 <div class="container">
-<h2>Aledrogo</h2>
-<a href="allProducts">Pokaż wszystkie produkty w sklepie</a><br>
-<a href="showCart">Pokaż zawartość koszyka</a><br>
-<a href="placeOrder">Złóż zamówienie</a><br>
+    <h2>Aledrogo</h2>
+    <a href="pokaz_wszystkie_produkty.jsp">Pokaż wszystkie produkty w sklepie</a><br>
+    <a href="pokaz_koszyk.jsp">Pokaż zawartość koszyka</a><br>
+    <a href="zloz_zamowienie.jsp">Złóż zamówienie</a><br>
 </div>
 <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
 <script type="text/javascript" src="js/materialize.min.js"></script>

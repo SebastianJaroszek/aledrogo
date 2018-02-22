@@ -138,7 +138,7 @@ public class AledrogoServlet extends HttpServlet {
     }
 
     private void createBackLink(PrintWriter out) {
-        out.println("<br><br><a href=\"index.jsp\">wróć</a>");
+        out.println("<br><br><a href=\"homepage.jsp\">wróć</a>");
     }
 
     private String showProduct(Product product) {
