@@ -1,6 +1,7 @@
 <%@ page import="java.time.LocalDateTime" %>
 <%@ page import="java.util.Random" %>
 <%@ page pageEncoding="UTF-8" %>
+<%@ page errorPage="errorpage.jsp" %>
 <html>
 <body>
 
